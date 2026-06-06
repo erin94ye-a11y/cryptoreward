@@ -172,7 +172,11 @@
     <div class="table-card">
       <div class="table-head">
         <div class="table-title">📋 用户明细记录</div>
-        <input class="search-input" type="text" id="searchInput" placeholder="搜索 IP 或 WhatsApp 号…" oninput="filterTable()"/>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input class="search-input" type="text" id="searchInput" placeholder="搜索 IP 或 WhatsApp 号…" oninput="filterTable()"/>
+          <button class="export-btn" onclick="exportAllCSV()">📥 导出全部 CSV</button>
+          <button class="export-btn" onclick="exportFilteredCSV()">📥 导出当前</button>
+        </div>
       </div>
       <div class="table-scroll">
         <div id="tableWrap"><div class="loading">加载中…</div></div>
@@ -436,6 +440,32 @@
     a.download = 'cryptoreward_links.csv';
     a.click();
     toast('✅ CSV 已下载');
+  }
+
+  // ── 用户明细导出 ──
+  function exportAllCSV() {
+    if (allRows.length === 0) { toast('暂无数据可导出'); return; }
+    downloadCSV(allRows, 'cryptoreward_用户明细_全部');
+  }
+  function exportFilteredCSV() {
+    if (filteredRows.length === 0) { toast('暂无数据可导出'); return; }
+    downloadCSV(filteredRows, 'cryptoreward_用户明细_当前筛选');
+  }
+  function downloadCSV(rows, filename) {
+    const header = '序号,WhatsApp 来源,IP 地址,点赞次数,积分,状态,最后点赞时间';
+    const data = rows.map((r, i) => {
+      const isMax = (r.likes_count || 0) >= 50;
+      const time = r.last_liked_at ? new Date(r.last_liked_at).toLocaleString('zh-CN', {hour12:false}) : '—';
+      const isDirect = !r.wa_ref || r.wa_ref === 'direct';
+      const waDisplay = isDirect ? '直接访问' : r.wa_ref;
+      return `${i+1},"${waDisplay}","${r.ip || '—'}",${r.likes_count || 0},${r.points || 0},${isMax ? '满赞' : '进行中'},"${time}"`;
+    });
+    const blob = new Blob(['\ufeff' + header + '\n' + data.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename + '_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    toast(`✅ 已导出 ${rows.length} 条记录`);
   }
 
   function copyText(text, btn) {
