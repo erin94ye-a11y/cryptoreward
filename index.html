@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="format-detection" content="telephone=no"/>
+  <title>CryptoReward · 点赞赢加密货币</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg: #070d18; --card: #0d1526; --card2: #111c30;
+      --border: rgba(255,255,255,0.08);
+      --gold: #f5b800; --gold-soft: rgba(245,184,0,0.18); --gold-glow: rgba(245,184,0,0.4);
+      --cyan: #00cfff; --green: #22d48a;
+      --text: #edf0f7; --muted: #6b7a9a;
+      --r: 'Syne', sans-serif; --b: 'Noto Sans SC', sans-serif;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--b); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    body::before { content: ''; position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(rgba(0,207,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,207,255,0.025) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
+    body::after { content: ''; position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 320px; height: 320px; background: radial-gradient(circle, rgba(245,184,0,0.12) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+    .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: rgba(7,13,24,0.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    .logo { font-family: var(--r); font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+    .logo em { color: var(--gold); font-style: normal; }
+    .topbar-btn { padding: 8px 18px; background: var(--gold); color: #090909; font-family: var(--r); font-weight: 700; font-size: 0.78rem; border: none; border-radius: 100px; cursor: pointer; box-shadow: 0 0 16px var(--gold-glow); -webkit-appearance: none; }
+    main { position: relative; z-index: 1; padding-top: 56px; }
+    .hero { padding: 36px 20px 28px; text-align: center; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border: 1px solid var(--gold-glow); background: var(--gold-soft); border-radius: 100px; font-size: 0.72rem; font-weight: 500; color: var(--gold); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 20px; opacity: 0; animation: fadeUp .5s .05s forwards; }
+    .badge-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; animation: blink 1.6s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero-title { font-family: var(--r); font-size: 2.2rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 14px; opacity: 0; animation: fadeUp .5s .12s forwards; }
+    .hero-title .g { color: var(--gold); } .hero-title .c { color: var(--cyan); }
+    .hero-desc { font-size: 0.88rem; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 24px; opacity: 0; animation: fadeUp .5s .2s forwards; }
+    .stats-row { display: flex; background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin: 0 20px 24px; overflow: hidden; opacity: 0; animation: fadeUp .5s .28s forwards; }
+    .stat-cell { flex: 1; padding: 16px 8px; text-align: center; border-right: 1px solid var(--border); }
+    .stat-cell:last-child { border-right: none; }
+    .stat-n { font-family: var(--r); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stat-l { font-size: 0.68rem; color: var(--muted); margin-top: 3px; letter-spacing: 0.04em; }
+    .like-card { margin: 0 16px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 28px 24px; position: relative; overflow: hidden; opacity: 0; animation: fadeUp .5s .35s forwards; }
+    .like-card::before { content: ''; position: absolute; top: -80px; right: -80px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(245,184,0,0.1) 0%, transparent 65%); pointer-events: none; }
+    .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .card-title { font-family: var(--r); font-size: 0.95rem; font-weight: 700; }
+    .live-tag { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--green); font-weight: 500; }
+    .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: blink 1.4s infinite; }
+    .like-wrap { text-align: center; margin-bottom: 24px; }
+    .like-btn { width: 96px; height: 96px; background: var(--card2); border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; cursor: pointer; outline: none; transition: border-color .2s, background .2s; position: relative; -webkit-appearance: none; }
+    .like-btn:active { transform: scale(0.93); }
+    .like-btn.liked { border-color: var(--gold); background: var(--gold-soft); box-shadow: 0 0 28px var(--gold-glow); animation: pop .3s ease; }
+    @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.18)} 100%{transform:scale(1)} }
+    .thumb { font-size: 2.4rem; line-height: 1; user-select: none; }
+    .like-num { font-family: var(--r); font-size: 2rem; font-weight: 800; color: var(--gold); letter-spacing: -0.03em; }
+    .like-hint { font-size: 0.72rem; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; }
+    .progress-wrap { margin-bottom: 20px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.73rem; color: var(--muted); margin-bottom: 8px; }
+    .progress-label span:last-child { color: var(--gold); font-weight: 600; }
+    .progress-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #ffdd55); border-radius: 100px; width: 0%; transition: width .4s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 0 8px var(--gold-glow); }
+    .pts-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; }
+    .pts-l { font-size: 0.8rem; color: var(--muted); }
+    .pts-v { font-family: var(--r); font-size: 0.95rem; font-weight: 700; color: var(--cyan); }
+    .pts-v.gold { color: var(--gold); }
+    .redeem-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--gold) 0%, #e8a800 100%); color: #090909; font-family: var(--r); font-weight: 700; font-size: 0.95rem; border: none; border-radius: 14px; cursor: pointer; margin-top: 6px; box-shadow: 0 4px 20px var(--gold-glow); -webkit-appearance: none; }
+    .redeem-btn:active { transform: scale(0.97); }
+    .redeem-btn:disabled { background: var(--card2); color: var(--muted); box-shadow: none; cursor: default; }
+    .section { padding: 8px 16px 20px; }
+    .sec-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; padding: 0 4px; }
+    .sec-title { font-family: var(--r); font-size: 1.4rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 16px; padding: 0 4px; }
+    .steps { display: flex; flex-direction: column; gap: 12px; }
+    .step { display: flex; gap: 16px; align-items: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; }
+    .step-num-box { flex-shrink: 0; width: 40px; height: 40px; background: var(--gold-soft); border: 1px solid var(--gold-glow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--r); font-size: 1rem; font-weight: 800; color: var(--gold); }
+    .step-name { font-size: 0.92rem; font-weight: 700; margin-bottom: 5px; }
+    .step-info { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+    .coins-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .coin-chip { display: flex; align-items: center; gap: 10px; padding: 13px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+    .coin-em { font-size: 1.5rem; }
+    .coin-name { font-family: var(--r); font-size: 0.82rem; font-weight: 700; }
+    .coin-min { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .bottom-cta { position: sticky; bottom: 0; padding: 14px 16px calc(14px + var(--safe-bottom)); background: linear-gradient(to top, rgba(7,13,24,0.98) 60%, transparent); z-index: 50; }
+    .bottom-cta-btn { width: 100%; padding: 17px; background: var(--gold); color: #090909; font-family: var(--r); font-weight: 800; font-size: 1rem; border: none; border-radius: 16px; cursor: pointer; box-shadow: 0 0 32px var(--gold-glow); -webkit-appearance: none; }
+    .bottom-cta-btn:active { transform: scale(0.97); opacity: 0.88; }
+    .footer { text-align: center; padding: 20px 20px calc(80px + var(--safe-bottom)); border-top: 1px solid var(--border); }
+    .footer-copy { font-size: 0.72rem; color: var(--muted); margin-bottom: 10px; }
+    .footer-links { display: flex; justify-content: center; gap: 20px; }
+    .footer-links a { font-size: 0.72rem; color: var(--muted); text-decoration: none; }
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(13,21,38,0.95); border: 1px solid var(--gold-glow); color: var(--text); padding: 11px 22px; border-radius: 100px; font-size: 0.82rem; font-weight: 500; z-index: 200; opacity: 0; white-space: nowrap; transition: all .3s cubic-bezier(0.175,0.885,0.32,1.275); backdrop-filter: blur(12px); pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .pt { position: fixed; pointer-events: none; width: 7px; height: 7px; border-radius: 50%; animation: ptfly .7s forwards ease-out; }
+    @keyframes ptfly { 0%{opacity:1;transform:translate(0,0) scale(1)} 100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0.2)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    .ip-tag { display: inline-block; margin-top: 6px; font-size: 0.68rem; color: var(--muted); background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; font-family: monospace; letter-spacing: 0.04em; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">Crypto<em>Reward</em></div>
+    <button class="topbar-btn" onclick="scrollToLike()">立即参与</button>
+  </div>
+  <main>
+    <div class="hero">
+      <div class="hero-badge"><span class="badge-dot"></span>限时活动 · 点赞领奖励</div>
+      <h1 class="hero-title">点一个赞<br/><span class="g">赢加密货币</span><br/><span class="c">奖励</span></h1>
+      <p class="hero-desc">每次点赞累积积分，积分可兑换 BTC、ETH、USDT 等主流加密货币，零门槛即可领取。</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-n" id="statTotal">—</div><div class="stat-l">总点赞数</div></div>
+      <div class="stat-cell"><div class="stat-n" id="statUsers">—</div><div class="stat-l">参与人数</div></div>
+      <div class="stat-cell"><div class="stat-n" id="statPts">—</div><div class="stat-l">总积分</div></div>
+    </div>
+    <div class="like-card" id="likeCard">
+      <div class="card-top">
+        <div class="card-title">🎯 活动面板</div>
+        <div class="live-tag"><span class="live-dot"></span>实时</div>
+      </div>
+      <div class="like-wrap">
+        <button class="like-btn" id="likeBtn" onclick="handleLike(event)">
+          <span class="thumb">👍</span>
+        </button>
+        <div class="like-num" id="likeNumEl">0</div>
+        <div class="like-hint" id="likeHint">今日点赞次数（上限 50）</div>
+        <div class="ip-tag" id="ipTag" style="display:none;"></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>兑换进度</span><span id="progressText">0 / 1000 积分</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="pts-row"><span class="pts-l">💎 我的积分</span><span class="pts-v gold" id="myPtsEl">0 积分</span></div>
+      <div class="pts-row"><span class="pts-l">⚡ 每次奖励</span><span class="pts-v">+10 积分</span></div>
+      <div class="pts-row"><span class="pts-l">🔄 兑换比率</span><span class="pts-v">100 积分 = 0.001 USDT</span></div>
+      <button class="redeem-btn" id="redeemBtn" onclick="handleRedeem()" disabled>再积 1000 积分可兑换</button>
+    </div>
+    <div class="section">
+      <div class="sec-label">活动规则</div>
+      <div class="sec-title">三步领奖励</div>
+      <div class="steps">
+        <div class="step"><div class="step-num-box">01</div><div><div class="step-name">👆 为内容点赞</div><div class="step-info">每天最多点赞 50 次，每次获得 10 积分。连续 7 天额外获得 200 积分。</div></div></div>
+        <div class="step"><div class="step-num-box">02</div><div><div class="step-name">💰 积分实时到账</div><div class="step-info">积分实时入账，账户随时可查。积分自获取之日起 90 天内有效。</div></div></div>
+        <div class="step"><div class="step-num-box">03</div><div><div class="step-name">🚀 兑换加密货币</div><div class="step-info">满 1000 积分即可发起兑换，支持多种主流币种，T+1 日到账。</div></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-label">支持币种</div>
+      <div class="sec-title">可兑换货币</div>
+      <div class="coins-grid">
+        <div class="coin-chip"><span class="coin-em">₿</span><div><div class="coin-name">Bitcoin</div><div class="coin-min">10,000 积分起</div></div></div>
+        <div class="coin-chip"><span class="coin-em">Ξ</span><div><div class="coin-name">Ethereum</div><div class="coin-min">5,000 积分起</div></div></div>
+        <div class="coin-chip"><span class="coin-em">💵</span><div><div class="coin-name">USDT</div><div class="coin-min">1,000 积分起</div></div></div>
+        <div class="coin-chip"><span class="coin-em">◎</span><div><div class="coin-name">Solana</div><div class="coin-min">3,000 积分起</div></div></div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-copy">© 2025 CryptoReward · 所有权利保留</div>
+      <div class="footer-links"><a href="#">隐私政策</a><a href="#">服务条款</a></div>
+    </div>
+  </main>
+  <div class="bottom-cta"><button class="bottom-cta-btn" onclick="scrollToLike()">👍 立即点赞，赢加密货币</button></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================================
+    // ⚙️  配置区 — 填入你的 Supabase 信息
+    // ============================================================
+    const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+    const TABLE = 'likes';
+    // ============================================================
+
+    const MAX = 50, NEED = 1000;
+    const TODAY = new Date().toISOString().slice(0, 10);
+    const STORE_KEY = 'cr_' + TODAY;
+
+    // ── 读取链接中的 WhatsApp 来源参数 ──
+    const urlParams = new URLSearchParams(window.location.search);
+    const WA_REF = urlParams.get('ref') || 'direct'; // e.g. ?ref=60123456789
+
+    let state = loadState();
+    let userIP = null;
+    let ipReady = false;
+
+    const likeBtn      = document.getElementById('likeBtn');
+    const likeNumEl    = document.getElementById('likeNumEl');
+    const myPtsEl      = document.getElementById('myPtsEl');
+    const redeemBtn    = document.getElementById('redeemBtn');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const ipTag        = document.getElementById('ipTag');
+    const likeHint     = document.getElementById('likeHint');
+
+    // 显示来源标识
+    if (WA_REF !== 'direct') {
+      const refEl = document.getElementById('refTag');
+      if (refEl) refEl.textContent = '👋 来自 WhatsApp: ' + WA_REF;
+    }
+
+    renderUI();
+    fetchIP();
+    loadGlobalStats();
+
+    // ── IP 查询 ──
+    async function fetchIP() {
+      try {
+        const res = await Promise.race([
+          fetch('https://api.ipify.org?format=json').then(r => r.json()),
+          fetch('https://api4.my-ip.io/v2/ip.json').then(r => r.json())
+        ]);
+        userIP = res.ip || res.IPv4 || null;
+      } catch (_) { userIP = null; }
+      ipReady = true;
+
+      if (userIP) {
+        // IP 静默记录，不显示给用户
+        await checkIPLimit();
+      } else {
+        // IP 获取失败，静默降级为本地限制
+      }
+      if (!state.ip && userIP) { state.ip = userIP; saveState(); }
+      renderUI();
+    }
+
+    // ── 检查服务端 IP 今日次数 ──
+    async function checkIPLimit() {
+      try {
+        const res = await sbFetch(`/rest/v1/${TABLE}?ip=eq.${userIP}&date=eq.${TODAY}&select=likes_count`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const serverLikes = data[0].likes_count || 0;
+          // 以服务端为准（防止清除 localStorage 作弊）
+          if (serverLikes > state.likes) {
+            state.likes = serverLikes;
+            state.pts = serverLikes * 10;
+            saveState();
+          }
+          if (state.likes >= MAX) lockButton('👑 今日已达点赞上限');
+        }
+      } catch (_) {}
+    }
+
+    // ── 点赞 ──
+    async function handleLike(e) {
+      if (!ipReady) { toast('⏳ 正在验证身份，请稍候…'); return; }
+      if (state.likes >= MAX) { toast('⚠️ 今日点赞已达上限（50 次）'); return; }
+
+      // 立即更新本地（乐观更新）
+      state.likes++;
+      state.pts += 10;
+      saveState();
+      renderUI();
+
+      likeBtn.classList.add('liked');
+      setTimeout(() => likeBtn.classList.remove('liked'), 350);
+      spawnParticles(e.currentTarget);
+
+      // 上报到 Supabase（upsert）
+      await upsertLike();
+
+      if (state.likes === 1)       toast('🎉 +10 积分已到账！');
+      else if (state.likes === 5)  toast('🔥 5 连赞！额外奖励 +20 积分');
+      else if (state.likes === 10) toast('⚡ 10 连赞！额外奖励 +50 积分');
+      else if (state.likes === 25) toast('🏆 半程达成！继续加油');
+      else if (state.likes >= MAX) { toast('👑 今日满赞！共获 ' + state.pts + ' 积分'); lockButton('👑 今日已达点赞上限'); }
+
+      // 刷新全局统计
+      loadGlobalStats();
+    }
+
+    // ── 上报 Supabase（含 WhatsApp 来源）──
+    async function upsertLike() {
+      if (!userIP) return;
+      try {
+        await sbFetch(`/rest/v1/${TABLE}`, {
+          method: 'POST',
+          headers: { 'Prefer': 'resolution=merge-duplicates' },
+          body: JSON.stringify({
+            ip: userIP,
+            date: TODAY,
+            likes_count: state.likes,
+            points: state.pts,
+            wa_ref: WA_REF,           // WhatsApp 来源（手机号或标识）
+            last_liked_at: new Date().toISOString()
+          })
+        });
+      } catch (_) {}
+    }
+
+    // ── 加载全局统计 ──
+    async function loadGlobalStats() {
+      try {
+        const res = await sbFetch(`/rest/v1/${TABLE}?select=likes_count,points&date=eq.${TODAY}`);
+        const rows = await res.json();
+        if (!Array.isArray(rows)) return;
+        const totalLikes = rows.reduce((s, r) => s + (r.likes_count || 0), 0);
+        const totalPts   = rows.reduce((s, r) => s + (r.points || 0), 0);
+        const totalUsers = rows.length;
+        document.getElementById('statTotal').textContent = totalLikes.toLocaleString();
+        document.getElementById('statUsers').textContent = totalUsers.toLocaleString();
+        document.getElementById('statPts').textContent   = totalPts.toLocaleString();
+      } catch (_) {}
+    }
+
+    // ── 兑换 ──
+    function handleRedeem() {
+      if (state.pts < NEED) return;
+      const usdt = (Math.floor(state.pts / 100) * 0.001).toFixed(3);
+      toast('✅ 已提交兑换，' + usdt + ' USDT T+1 到账');
+      state.pts = 0; saveState(); renderUI();
+      redeemBtn.disabled = true;
+      redeemBtn.textContent = '继续点赞累积积分';
+    }
+
+    // ── Supabase fetch 封装 ──
+    function sbFetch(path, opts = {}) {
+      return fetch(SUPABASE_URL + path, {
+        ...opts,
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          ...(opts.headers || {})
+        }
+      });
+    }
+
+    // ── 渲染 ──
+    function renderUI() {
+      likeNumEl.textContent = state.likes;
+      myPtsEl.textContent   = state.pts.toLocaleString() + ' 积分';
+      const pct = Math.min((state.pts / NEED) * 100, 100);
+      progressFill.style.width = pct + '%';
+      progressText.textContent = `${state.pts} / ${NEED} 积分`;
+      if (state.pts >= NEED) {
+        redeemBtn.disabled = false;
+        redeemBtn.textContent = '🎉 立即兑换加密货币';
+      } else {
+        redeemBtn.disabled = true;
+        redeemBtn.textContent = state.likes >= MAX ? '积分不足，明日继续点赞' : `再积 ${NEED - state.pts} 积分可兑换`;
+      }
+    }
+
+    function lockButton(label) {
+      likeBtn.disabled = true; likeBtn.style.opacity = '0.45'; likeBtn.style.cursor = 'default';
+      likeHint.textContent = label;
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORE_KEY);
+        if (!raw) return { date: TODAY, likes: 0, pts: 0, ip: null };
+        return JSON.parse(raw);
+      } catch (_) { return { date: TODAY, likes: 0, pts: 0, ip: null }; }
+    }
+    function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (_) {} }
+
+    function spawnParticles(el) {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const cols = ['#f5b800','#00cfff','#22d48a','#ff6b9d','#ffffff'];
+      for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div'); p.className = 'pt';
+        const a = (Math.PI * 2 / 12) * i, d = 45 + Math.random() * 45;
+        p.style.cssText = `left:${cx-3.5}px;top:${cy-3.5}px;background:${cols[i%cols.length]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px`;
+        document.body.appendChild(p); setTimeout(() => p.remove(), 700);
+      }
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast'); t.textContent = msg;
+      t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function scrollToLike() { document.getElementById('likeCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  </script>
+</body>
+</html>
