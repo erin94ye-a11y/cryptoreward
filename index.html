@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="format-detection" content="telephone=no"/>
-  <title>CryptoReward · 点赞赢加密货币</title>
+  <title>CryptoReward · 每日签到赢奖励</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -97,58 +97,42 @@
 <body>
   <div class="topbar">
     <div class="logo">Crypto<em>Reward</em></div>
-    <button class="topbar-btn" onclick="scrollToLike()">立即参与</button>
+    <button class="topbar-btn" onclick="scrollToCheckin()">立即签到</button>
   </div>
   <main>
     <div class="hero">
-      <div class="hero-badge"><span class="badge-dot"></span>限时活动 · 点赞领奖励</div>
-      <h1 class="hero-title">点一个赞<br/><span class="g">赢加密货币</span><br/><span class="c">奖励</span></h1>
-      <p class="hero-desc">每次点赞累积积分，积分可兑换 BTC、ETH、USDT 等主流加密货币，零门槛即可领取。</p>
+      <div class="hero-badge"><span class="badge-dot"></span>每日签到 · 累计赢奖励</div>
+      <h1 class="hero-title">每日签到<br/><span class="g">累计天数</span><br/><span class="c">赢奖励</span></h1>
+      <p class="hero-desc">每天签到一次，累计签到天数越多，解锁的奖励越丰厚。</p>
     </div>
     <div class="stats-row">
-      <div class="stat-cell"><div class="stat-n" id="statTotal">—</div><div class="stat-l">总点赞数</div></div>
-      <div class="stat-cell"><div class="stat-n" id="statUsers">—</div><div class="stat-l">参与人数</div></div>
-      <div class="stat-cell"><div class="stat-n" id="statPts">—</div><div class="stat-l">总积分</div></div>
+      <div class="stat-cell"><div class="stat-n" id="myDaysEl">0</div><div class="stat-l">我的签到天数</div></div>
+      <div class="stat-cell"><div class="stat-n" id="statUsers">—</div><div class="stat-l">总参与人数</div></div>
+      <div class="stat-cell"><div class="stat-n" id="statToday">0</div><div class="stat-l">今日签到</div></div>
     </div>
     <div class="like-card" id="likeCard">
       <div class="card-top">
-        <div class="card-title">🎯 活动面板</div>
-        <div class="live-tag"><span class="live-dot"></span>实时</div>
+        <div class="card-title">📅 每日签到</div>
+        <div class="live-tag"><span class="live-dot"></span>今日</div>
       </div>
       <div class="like-wrap">
-        <button class="like-btn" id="likeBtn" onclick="handleLike(event)">
-          <span class="thumb">👍</span>
+        <button class="like-btn" id="likeBtn" onclick="handleCheckin(event)">
+          <span class="thumb" id="thumbIcon">✅</span>
         </button>
-        <div class="like-num" id="likeNumEl">0</div>
-        <div class="like-hint" id="likeHint">今日点赞次数（上限 50）</div>
-        <div class="ip-tag" id="ipTag" style="display:none;"></div>
+        <div class="like-num" id="statusText">点击签到</div>
+        <div class="like-hint" id="hintText">今天你签到了吗？</div>
       </div>
-      <div class="progress-wrap">
-        <div class="progress-label"><span>兑换进度</span><span id="progressText">0 / 1000 积分</span></div>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      </div>
-      <div class="pts-row"><span class="pts-l">💎 我的积分</span><span class="pts-v gold" id="myPtsEl">0 积分</span></div>
-      <div class="pts-row"><span class="pts-l">⚡ 每次奖励</span><span class="pts-v">+10 积分</span></div>
-      <div class="pts-row"><span class="pts-l">🔄 兑换比率</span><span class="pts-v">100 积分 = 0.001 USDT</span></div>
-      <button class="redeem-btn" id="redeemBtn" onclick="handleRedeem()" disabled>再积 1000 积分可兑换</button>
+      <div class="pts-row"><span class="pts-l">📆 连续签到</span><span class="pts-v gold" id="streakEl">0 天</span></div>
+      <div class="pts-row"><span class="pts-l">🏆 累计签到</span><span class="pts-v" id="totalDaysEl">0 天</span></div>
+      <div class="pts-row" id="nextRewardRow"><span class="pts-l">🎁 下一个奖励</span><span class="pts-v" id="nextRewardEl">签到 7 天解锁</span></div>
     </div>
     <div class="section">
-      <div class="sec-label">活动规则</div>
-      <div class="sec-title">三步领奖励</div>
+      <div class="sec-label">签到奖励</div>
+      <div class="sec-title">累计天数解锁</div>
       <div class="steps">
-        <div class="step"><div class="step-num-box">01</div><div><div class="step-name">👆 为内容点赞</div><div class="step-info">每天最多点赞 50 次，每次获得 10 积分。连续 7 天额外获得 200 积分。</div></div></div>
-        <div class="step"><div class="step-num-box">02</div><div><div class="step-name">💰 积分实时到账</div><div class="step-info">积分实时入账，账户随时可查。积分自获取之日起 90 天内有效。</div></div></div>
-        <div class="step"><div class="step-num-box">03</div><div><div class="step-name">🚀 兑换加密货币</div><div class="step-info">满 1000 积分即可发起兑换，支持多种主流币种，T+1 日到账。</div></div></div>
-      </div>
-    </div>
-    <div class="section">
-      <div class="sec-label">支持币种</div>
-      <div class="sec-title">可兑换货币</div>
-      <div class="coins-grid">
-        <div class="coin-chip"><span class="coin-em">₿</span><div><div class="coin-name">Bitcoin</div><div class="coin-min">10,000 积分起</div></div></div>
-        <div class="coin-chip"><span class="coin-em">Ξ</span><div><div class="coin-name">Ethereum</div><div class="coin-min">5,000 积分起</div></div></div>
-        <div class="coin-chip"><span class="coin-em">💵</span><div><div class="coin-name">USDT</div><div class="coin-min">1,000 积分起</div></div></div>
-        <div class="coin-chip"><span class="coin-em">◎</span><div><div class="coin-name">Solana</div><div class="coin-min">3,000 积分起</div></div></div>
+        <div class="step"><div class="step-num-box">7</div><div><div class="step-name">🎫 签到 7 天</div><div class="step-info">解锁基础奖励，获得参与抽奖资格</div></div></div>
+        <div class="step"><div class="step-num-box">14</div><div><div class="step-name">🎁 签到 14 天</div><div class="step-info">解锁中级奖励，获得双倍抽奖机会</div></div></div>
+        <div class="step"><div class="step-num-box">30</div><div><div class="step-name">🏅 签到 30 天</div><div class="step-info">解锁高级奖励，获得专属勋章及加密货币奖励资格</div></div></div>
       </div>
     </div>
     <div class="footer">
@@ -157,7 +141,7 @@
       <a class="vercel-deploy" href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ferin94ye-a11y%2Fcryptoreward" target="_blank" rel="noopener">▲ 在 Vercel 上部署</a>
     </div>
   </main>
-  <div class="bottom-cta"><button class="bottom-cta-btn" onclick="scrollToLike()">👍 立即点赞，赢加密货币</button></div>
+  <div class="bottom-cta"><button class="bottom-cta-btn" onclick="scrollToCheckin()">📅 每日签到，累计赢奖励</button></div>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -169,40 +153,36 @@
     const TABLE = 'likes';
     // ============================================================
 
-    const MAX = 50, NEED = 1000;
+    const BASE_USERS = 678; // 参与人数基数
+    const MAX = 1; // 每天只能签到1次
     const TODAY = new Date().toISOString().slice(0, 10);
-    const STORE_KEY = 'cr_' + TODAY;
+    const STORE_KEY = 'cr_checkin_' + TODAY;
 
     // ── 读取链接中的 WhatsApp 来源参数 ──
     const urlParams = new URLSearchParams(window.location.search);
-    const WA_REF = urlParams.get('ref') || 'direct'; // e.g. ?ref=60123456789
+    const WA_REF = urlParams.get('ref') || 'direct';
 
     let state = loadState();
     let userIP = null;
     let ipReady = false;
 
-    const likeBtn      = document.getElementById('likeBtn');
-    const likeNumEl    = document.getElementById('likeNumEl');
-    const myPtsEl      = document.getElementById('myPtsEl');
-    const redeemBtn    = document.getElementById('redeemBtn');
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const ipTag        = document.getElementById('ipTag');
-    const likeHint     = document.getElementById('likeHint');
-
-    // 显示来源标识
-    if (WA_REF !== 'direct') {
-      const refEl = document.getElementById('refTag');
-      if (refEl) refEl.textContent = '👋 来自 WhatsApp: ' + WA_REF;
-    }
+    const likeBtn    = document.getElementById('likeBtn');
+    const statusText = document.getElementById('statusText');
+    const hintText   = document.getElementById('hintText');
+    const thumbIcon  = document.getElementById('thumbIcon');
+    const myDaysEl   = document.getElementById('myDaysEl');
+    const streakEl   = document.getElementById('streakEl');
+    const totalDaysEl = document.getElementById('totalDaysEl');
+    const nextRewardEl = document.getElementById('nextRewardEl');
+    const statToday  = document.getElementById('statToday');
 
     renderUI();
     fetchIP();
     loadGlobalStats();
+    loadUserHistory();
 
     // ── IP 查询（多源兜底）──
     async function fetchIP() {
-      // 尝试多个 IP 查询服务，任何一个成功就使用
       const sources = [
         'https://api.ipify.org?format=json',
         'https://api4.my-ip.io/v2/ip.json',
@@ -218,7 +198,6 @@
           if (userIP) break;
         } catch (_) { continue; }
       }
-      // 最终兜底：生成随机匿名 ID
       if (!userIP) {
         let pid = localStorage.getItem('cr_anon_id');
         if (!pid) { pid = 'anon_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem('cr_anon_id', pid); }
@@ -226,58 +205,107 @@
       }
       ipReady = true;
       if (!state.ip && userIP) { state.ip = userIP; saveState(); }
-      await checkIPLimit();
+      await loadServerState();
       renderUI();
     }
 
-    // ── 检查服务端 IP 今日次数 ──
-    async function checkIPLimit() {
+    // ── 从服务端加载今日签到状态和累计天数 ──
+    let serverTodayDone = false;
+    let totalCheckinDays = 0;  // 累计签到天数
+    let lastCheckinDate = null;
+
+    async function loadServerState() {
+      if (!userIP) return;
       try {
-        const res = await sbFetch(`/rest/v1/${TABLE}?ip=eq.${userIP}&date=eq.${TODAY}&select=likes_count`);
-        const data = await res.json();
-        if (data && data.length > 0) {
-          const serverLikes = data[0].likes_count || 0;
-          // 以服务端为准（防止清除 localStorage 作弊）
-          if (serverLikes > state.likes) {
-            state.likes = serverLikes;
-            state.pts = serverLikes * 10;
-            saveState();
-          }
-          if (state.likes >= MAX) lockButton('👑 今日已达点赞上限');
+        // 查今日签到
+        const r = await sbFetch(`/rest/v1/${TABLE}?ip=eq.${userIP}&date=eq.${TODAY}&select=likes_count`);
+        const d = await r.json();
+        if (d && d.length > 0 && d[0].likes_count >= 1) {
+          serverTodayDone = true;
+          state.likes = 1;
+          saveState();
+        }
+      } catch (_) {}
+
+      try {
+        // 查历史总签到天数
+        const r2 = await sbFetch(`/rest/v1/${TABLE}?ip=eq.${userIP}&select=likes_count`);
+        const d2 = await r2.json();
+        if (Array.isArray(d2)) {
+          totalCheckinDays = d2.length; // 每个日期一条记录
+        }
+      } catch (_) {}
+
+      try {
+        // 查上次签到日期（用于计算连续）
+        const r3 = await sbFetch(`/rest/v1/${TABLE}?ip=eq.${userIP}&order=date.desc&limit=2&select=date`);
+        const d3 = await r3.json();
+        if (Array.isArray(d3) && d3.length > 0) {
+          lastCheckinDate = d3[0].date;
         }
       } catch (_) {}
     }
 
-    // ── 点赞 ──
-    async function handleLike(e) {
-      if (!ipReady) { toast('⏳ 正在验证身份，请稍候…'); return; }
-      if (state.likes >= MAX) { toast('⚠️ 今日点赞已达上限（50 次）'); return; }
+    // ── 加载用户全部历史记录（前台累加）──
+    async function loadUserHistory() {
+      if (!userIP) return;
+      try {
+        const r = await sbFetch(`/rest/v1/${TABLE}?ip=eq.${userIP}&select=date`);
+        const d = await r.json();
+        if (Array.isArray(d)) {
+          totalCheckinDays = d.length;
+        }
+      } catch (_) {}
+      renderUI();
+    }
 
-      // 立即更新本地（乐观更新）
-      state.likes++;
-      state.pts += 10;
+    // ── 签到 ──
+    async function handleCheckin(e) {
+      if (!ipReady) { toast('⏳ 正在验证身份，请稍候…'); return; }
+      if (state.likes >= MAX || serverTodayDone) { toast('✅ 今天已签到，明天再来吧！'); return; }
+
+      state.likes = 1;
       saveState();
+      serverTodayDone = true;
+      totalCheckinDays++;
+
+      // 计算连续
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yStr = yesterday.toISOString().slice(0, 10);
+      if (lastCheckinDate === yStr) {
+        // 连续签到 - streak 在 render 里算
+      }
+      lastCheckinDate = TODAY;
       renderUI();
 
       likeBtn.classList.add('liked');
       setTimeout(() => likeBtn.classList.remove('liked'), 350);
       spawnParticles(e.currentTarget);
 
-      // 上报到 Supabase（upsert）
-      await upsertLike();
+      // 上报到 Supabase
+      await upsertCheckin();
 
-      if (state.likes === 1)       toast('🎉 +10 积分已到账！');
-      else if (state.likes === 5)  toast('🔥 5 连赞！额外奖励 +20 积分');
-      else if (state.likes === 10) toast('⚡ 10 连赞！额外奖励 +50 积分');
-      else if (state.likes === 25) toast('🏆 半程达成！继续加油');
-      else if (state.likes >= MAX) { toast('👑 今日满赞！共获 ' + state.pts + ' 积分'); lockButton('👑 今日已达点赞上限'); }
-
-      // 刷新全局统计
+      toast('✅ 签到成功！已连续签到 ' + calcStreak() + ' 天');
       loadGlobalStats();
     }
 
-    // ── 上报 Supabase（含 WhatsApp 来源）──
-    async function upsertLike() {
+    function calcStreak() {
+      // 简化：从前台存储的连续天数计算
+      try {
+        const raw = localStorage.getItem('cr_streak_data');
+        if (!raw) return 1;
+        const data = JSON.parse(raw);
+        const y = new Date(); y.setDate(y.getDate() - 1);
+        if (data.lastDate === y.toISOString().slice(0, 10)) {
+          return data.streak + 1;
+        }
+        return 1;
+      } catch (_) { return 1; }
+    }
+
+    // ── 上报 Supabase ──
+    async function upsertCheckin() {
       if (!userIP) return;
       try {
         await sbFetch(`/rest/v1/${TABLE}`, {
@@ -286,9 +314,9 @@
           body: JSON.stringify({
             ip: userIP,
             date: TODAY,
-            likes_count: state.likes,
-            points: state.pts,
-            wa_ref: WA_REF,           // WhatsApp 来源（手机号或标识）
+            likes_count: 1,
+            points: 1,
+            wa_ref: WA_REF,
             last_liked_at: new Date().toISOString()
           })
         });
@@ -298,26 +326,13 @@
     // ── 加载全局统计 ──
     async function loadGlobalStats() {
       try {
-        const res = await sbFetch(`/rest/v1/${TABLE}?select=likes_count,points&date=eq.${TODAY}`);
+        const res = await sbFetch(`/rest/v1/${TABLE}?select=ip,date&date=eq.${TODAY}`);
         const rows = await res.json();
         if (!Array.isArray(rows)) return;
-        const totalLikes = rows.reduce((s, r) => s + (r.likes_count || 0), 0);
-        const totalPts   = rows.reduce((s, r) => s + (r.points || 0), 0);
-        const totalUsers = rows.length;
-        document.getElementById('statTotal').textContent = totalLikes.toLocaleString();
-        document.getElementById('statUsers').textContent = totalUsers.toLocaleString();
-        document.getElementById('statPts').textContent   = totalPts.toLocaleString();
+        const totalUsers = new Set(rows.map(r => r.ip)).size;
+        document.getElementById('statUsers').textContent = (BASE_USERS + totalUsers).toLocaleString();
+        document.getElementById('statToday').textContent = totalUsers.toLocaleString();
       } catch (_) {}
-    }
-
-    // ── 兑换 ──
-    function handleRedeem() {
-      if (state.pts < NEED) return;
-      const usdt = (Math.floor(state.pts / 100) * 0.001).toFixed(3);
-      toast('✅ 已提交兑换，' + usdt + ' USDT T+1 到账');
-      state.pts = 0; saveState(); renderUI();
-      redeemBtn.disabled = true;
-      redeemBtn.textContent = '继续点赞累积积分';
     }
 
     // ── Supabase fetch 封装 ──
@@ -335,33 +350,57 @@
 
     // ── 渲染 ──
     function renderUI() {
-      likeNumEl.textContent = state.likes;
-      myPtsEl.textContent   = state.pts.toLocaleString() + ' 积分';
-      const pct = Math.min((state.pts / NEED) * 100, 100);
-      progressFill.style.width = pct + '%';
-      progressText.textContent = `${state.pts} / ${NEED} 积分`;
-      if (state.pts >= NEED) {
-        redeemBtn.disabled = false;
-        redeemBtn.textContent = '🎉 立即兑换加密货币';
-      } else {
-        redeemBtn.disabled = true;
-        redeemBtn.textContent = state.likes >= MAX ? '积分不足，明日继续点赞' : `再积 ${NEED - state.pts} 积分可兑换`;
-      }
-    }
+      const done = state.likes >= 1 || serverTodayDone;
+      const streak = calcStreak();
 
-    function lockButton(label) {
-      likeBtn.disabled = true; likeBtn.style.opacity = '0.45'; likeBtn.style.cursor = 'default';
-      likeHint.textContent = label;
+      if (done) {
+        thumbIcon.textContent = '✅';
+        statusText.textContent = '今日已签到';
+        hintText.textContent = '明天再来签到吧！';
+        likeBtn.disabled = true;
+        likeBtn.style.opacity = '0.45';
+        likeBtn.style.cursor = 'default';
+      } else {
+        thumbIcon.textContent = '📅';
+        statusText.textContent = '点击签到';
+        hintText.textContent = '今天你签到了吗？';
+        likeBtn.disabled = false;
+        likeBtn.style.opacity = '1';
+        likeBtn.style.cursor = 'pointer';
+      }
+
+      streakEl.textContent = streak + ' 天';
+      myDaysEl.textContent = totalCheckinDays;
+      totalDaysEl.textContent = totalCheckinDays + ' 天';
+
+      // 下一个奖励
+      const milestones = [7, 14, 21, 30, 60, 90];
+      let next = null;
+      for (const m of milestones) {
+        if (totalCheckinDays < m) { next = m; break; }
+      }
+      if (next) {
+        nextRewardEl.textContent = '签到 ' + next + ' 天解锁';
+      } else {
+        nextRewardEl.textContent = '🎉 全部奖励已解锁！';
+      }
     }
 
     function loadState() {
       try {
         const raw = localStorage.getItem(STORE_KEY);
-        if (!raw) return { date: TODAY, likes: 0, pts: 0, ip: null };
+        if (!raw) return { date: TODAY, likes: 0, ip: null };
         return JSON.parse(raw);
-      } catch (_) { return { date: TODAY, likes: 0, pts: 0, ip: null }; }
+      } catch (_) { return { date: TODAY, likes: 0, ip: null }; }
     }
-    function saveState() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (_) {} }
+    function saveState() {
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+        // 维护连续签到数据
+        const s = calcStreak();
+        localStorage.setItem('cr_streak_data', JSON.stringify({ lastDate: TODAY, streak: s }));
+      } catch (_) {}
+    }
 
     function spawnParticles(el) {
       const r = el.getBoundingClientRect();
@@ -380,7 +419,7 @@
       t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600);
     }
 
-    function scrollToLike() { document.getElementById('likeCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    function scrollToCheckin() { document.getElementById('likeCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   </script>
 </body>
 </html>
