@@ -200,24 +200,33 @@
     fetchIP();
     loadGlobalStats();
 
-    // ── IP 查询 ──
+    // ── IP 查询（多源兜底）──
     async function fetchIP() {
-      try {
-        const res = await Promise.race([
-          fetch('https://api.ipify.org?format=json').then(r => r.json()),
-          fetch('https://api4.my-ip.io/v2/ip.json').then(r => r.json())
-        ]);
-        userIP = res.ip || res.IPv4 || null;
-      } catch (_) { userIP = null; }
-      ipReady = true;
-
-      if (userIP) {
-        // IP 静默记录，不显示给用户
-        await checkIPLimit();
-      } else {
-        // IP 获取失败，静默降级为本地限制
+      // 尝试多个 IP 查询服务，任何一个成功就使用
+      const sources = [
+        'https://api.ipify.org?format=json',
+        'https://api4.my-ip.io/v2/ip.json',
+        'https://ipapi.co/json/',
+        'https://jsonip.com',
+        'https://httpbin.org/ip'
+      ];
+      for (const url of sources) {
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+          const data = await res.json();
+          userIP = data.ip || data.IPv4 || data.origin || null;
+          if (userIP) break;
+        } catch (_) { continue; }
       }
+      // 最终兜底：生成随机匿名 ID
+      if (!userIP) {
+        let pid = localStorage.getItem('cr_anon_id');
+        if (!pid) { pid = 'anon_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem('cr_anon_id', pid); }
+        userIP = pid;
+      }
+      ipReady = true;
       if (!state.ip && userIP) { state.ip = userIP; saveState(); }
+      await checkIPLimit();
       renderUI();
     }
 
